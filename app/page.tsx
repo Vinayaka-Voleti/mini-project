@@ -1,22 +1,55 @@
 'use client'
 
 import Link from 'next/link'
-import { BarChart3, TrendingDown, Users, Leaf } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { BarChart3, TrendingDown, Users, Leaf, LogOut } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 export default function Home() {
+  const { user, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.push('/')
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-emerald-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <Leaf className="w-8 h-8 text-emerald-600" />
             <span className="text-2xl font-bold text-emerald-600">FoodWaste AI</span>
-          </div>
-          <div className="flex gap-4">
-            <Link href="/predict" className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium">
-              Start Predicting
-            </Link>
+          </Link>
+          <div className="flex gap-4 items-center">
+            {user ? (
+              <>
+                <Link href="/predict" className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition">
+                  Predict
+                </Link>
+                <Link href="/dashboard" className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition">
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium flex items-center gap-2 transition"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="px-4 py-2 text-emerald-600 hover:bg-emerald-50 rounded-lg font-medium transition">
+                  Sign In
+                </Link>
+                <Link href="/signup" className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -32,12 +65,25 @@ export default function Home() {
               Use AI-powered predictions to optimize meal planning, reduce waste, and save costs for your hostel mess operations.
             </p>
             <div className="flex gap-4">
-              <Link href="/predict" className="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg">
-                Get Started
-              </Link>
-              <Link href="/dashboard" className="px-8 py-4 border-2 border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors font-semibold text-lg">
-                View Dashboard
-              </Link>
+              {user ? (
+                <>
+                  <Link href="/predict" className="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg">
+                    Make Prediction
+                  </Link>
+                  <Link href="/dashboard" className="px-8 py-4 border-2 border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors font-semibold text-lg">
+                    My Dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" className="px-8 py-4 border-2 border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors font-semibold text-lg">
+                    Create Account
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

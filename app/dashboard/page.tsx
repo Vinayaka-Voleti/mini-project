@@ -1,8 +1,11 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, TrendingDown, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useAuth } from '@/lib/auth-context'
 
 const wasteData = [
   { date: 'Mon', waste: 45, target: 30 },
@@ -22,21 +25,41 @@ const mealWasteData = [
 ]
 
 export default function DashboardPage() {
+  const { user } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+    }
+  }, [user, router])
+
+  if (!user) return null
+
   const totalWaste = wasteData.reduce((sum, item) => sum + item.waste, 0)
   const avgWaste = (totalWaste / wasteData.length).toFixed(1)
   const totalCost = Math.round(totalWaste * 25)
+  const userPredictionCount = user.predictions?.length || 0
+  const userTotalWaste = user.predictions?.reduce((sum, p) => sum + p.waste, 0) || 0
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/" className="p-2 hover:bg-white rounded-lg transition-colors">
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Weekly waste management analytics and insights</p>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">
+                Welcome, <span className="text-emerald-600">{user.name}</span>
+              </h1>
+              <p className="text-gray-600 text-lg mt-1">
+                Dashboard for <span className="font-semibold">{user.hostelName}</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600 mb-1">Predictions Made</p>
+              <p className="text-3xl font-bold text-emerald-600">{userPredictionCount}</p>
+            </div>
           </div>
         </div>
 
